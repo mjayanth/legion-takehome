@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legion Onboarding Prototype</title>
+<meta name="description" content="Prototype: Legion Health's onboarding flow, reordered around the patient, with an AI care navigator. Synthetic data only.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<a class="skip" href="#card">Skip to the current question</a>
+<div class="shell">
+  <aside id="left" class="left" aria-label="Your plan, what we remember, and activity">
+    <div class="brand"><span class="wordmark">Legion Health</span><span class="proto-tag">Prototype</span></div>
+    <div id="side" class="side"></div>
+  </aside>
+  <main class="right">
+    <div class="topbar">
+      <button type="button" class="back" id="btn-back" data-action="back" data-testid="btn-back" hidden><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back</button>
+      <div id="progress" class="progress" role="progressbar" aria-label="Onboarding progress" aria-valuemin="0" aria-valuemax="100"></div>
+      <span id="pct" class="pct" aria-hidden="true"></span>
+    </div>
+    <div class="toolbar">
+      <span class="wordmark m-only">Legion Health</span>
+      <div class="tools">
+        <button type="button" class="tool m-only" data-action="panel" data-testid="btn-plan" aria-label="Your plan"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Your plan</span></button>
+        <button type="button" class="tool" data-action="human" data-testid="btn-header-human" aria-label="Talk to a person"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Talk to a person</span></button>
+        <a class="tool tool-risk" href="tel:988" data-testid="btn-header-988"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>988</span><span class="sr-only"> crisis line, call or text</span></a>
+        <button type="button" class="tool tool-review" data-action="toggleDrawer" data-testid="reviewer-toggle" aria-label="How this works" aria-expanded="false" aria-controls="drawer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2v6L4 18a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-5-10V2M8 2h8"/></svg><span>How this works</span></button>
+      </div>
+    </div>
+    <div id="scenario-banner" class="banner"></div>
+    <div id="stage-wrap" class="stage-wrap">
+      <div class="stage">
+        <div id="note"></div>
+        <div id="card" class="card-slot" tabindex="-1"></div>
+      </div>
+    </div>
+    <div class="composer-wrap">
+      <p id="safety-line" class="safety-line"></p>
+      <div class="composer">
+        <label for="composer" class="sr-only">Ask a question or tell us more</label>
+        <input id="composer" data-testid="composer" placeholder="Ask a question or tell us more" autocomplete="off">
+        <button type="button" class="send" data-action="composerSend" data-testid="composer-send" aria-label="Send"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+      <p class="convo-link"><button type="button" class="link small" data-action="convo" data-testid="btn-convo">See the whole conversation</button></p>
+    </div>
+  </main>
+</div>
+<section id="convo" class="convo" hidden aria-labelledby="convo-title">
+  <div class="dr-head"><h2 id="convo-title" tabindex="-1">Conversation</h2><button type="button" class="btn btn-ghost" data-action="convo">Close</button></div>
+  <ol id="thread" class="thread" data-testid="thread"></ol>
+</section>
+<aside id="drawer" class="drawer" hidden aria-labelledby="drawer-title"></aside>
+<div id="mode-pill" class="mode-pill" hidden></div>
+<div id="live" class="sr-only" aria-live="polite"></div>
+<script>/*__JS__*/</script>
+</body>
+</html>
