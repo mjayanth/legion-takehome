@@ -1,0 +1,188 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Patient-First Onboarding Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a vertical spine of the ten stages, each with its branches beside it, then what is and isn't built, then why. */
+:root{
+  --bg:#f5f9fa; --surface:#ffffff; --ink:#0f2a33; --muted:#4b6470; --rule:#d5e3e7;
+  --accent:#0e7490; --accent-soft:#e0f2f6; --ok:#166534; --ok-soft:#e3f4e8;
+  --wait:#854d0e; --wait-soft:#fbf1dc; --idle:#475569; --idle-soft:#eef2f5; --risk:#b91c1c;
+  --display:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1a1f; --surface:#112a31; --ink:#e4f1f4; --muted:#9db6be; --rule:#24434c;
+  --accent:#5cc3db; --accent-soft:#143c47; --ok:#6fcf8f; --ok-soft:#173a25;
+  --wait:#e7b65a; --wait-soft:#3a2f14; --idle:#b6c4cc; --idle-soft:#1b343c; --risk:#f08a8a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1a1f; --surface:#112a31; --ink:#e4f1f4; --muted:#9db6be; --rule:#24434c;
+  --accent:#5cc3db; --accent-soft:#143c47; --ok:#6fcf8f; --ok-soft:#173a25;
+  --wait:#e7b65a; --wait-soft:#3a2f14; --idle:#b6c4cc; --idle-soft:#1b343c; --risk:#f08a8a; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:36px}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+header{display:grid;gap:12px;max-width:72ch}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(28px,4.4vw,40px)/1.1 var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font:600 22px/1.2 var(--display);margin:0;text-wrap:balance}
+.dek{margin:0;font-size:18px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--muted);align-items:center}
+.key{display:inline-flex;align-items:center;gap:8px}
+.sw{width:22px;height:14px;border-radius:4px;border:2px solid var(--accent);background:var(--accent-soft)}
+.sw.stop{border-style:dashed;border-color:var(--wait);background:var(--wait-soft)}
+.sw.not{border:2px solid var(--rule);background:transparent}
+.sim{font:500 10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:999px;background:var(--idle-soft);color:var(--idle);white-space:nowrap}
+.flow{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.stage{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:0 16px;position:relative;padding-bottom:18px}
+.stage::before{content:"";position:absolute;left:21px;top:44px;bottom:0;width:2px;background:var(--accent)}
+.stage:last-child::before{display:none}
+.num{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:600 15px/1 var(--mono);background:var(--surface);border:2px solid var(--accent);color:var(--accent);position:relative;z-index:1}
+.box{background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:12px 14px;display:grid;gap:6px;min-width:0}
+.box h3{font:600 16px/1.3 var(--body);margin:0}
+.box p{margin:0;font-size:14.5px;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.t{font:500 11px/1 var(--mono);padding:4px 6px;border-radius:5px;background:var(--accent-soft);color:var(--accent)}
+.branches{display:grid;gap:8px;align-content:start;min-width:0}
+.br{border-radius:10px;padding:9px 12px;font-size:14px;display:grid;gap:4px;min-width:0}
+.br.built{border:1px solid var(--accent);background:var(--surface)}
+.br.stop{border:2px dashed var(--wait);background:var(--wait-soft)}
+.br.not{border:1px solid var(--rule);color:var(--muted)}
+.br b{font-weight:600}
+.br .why{color:var(--muted);font-size:13.5px}
+.br.stop .why{color:var(--ink)}
+@media (max-width:760px){
+  .stage{grid-template-columns:34px minmax(0,1fr)}
+  .num{width:34px;height:34px;font-size:13px}
+  .stage::before{left:16px;top:34px}
+  .branches{grid-column:2;margin-top:8px}
+}
+.always{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}}
+.col{display:grid;gap:10px;align-content:start;min-width:0}
+.col h3{font:600 17px/1.2 var(--display);margin:0;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+.col.stop h3{border-bottom:2px dashed var(--wait)}
+.col.not h3{border-bottom-color:var(--rule)}
+.col ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px}
+.col li span{color:var(--muted)}
+.why-list{margin:0;padding-left:20px;display:grid;gap:10px;max-width:72ch}
+.why-list strong{font-weight:600}
+.note{font-size:14px;color:var(--muted);margin:0;max-width:72ch}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);padding-top:14px}
+</style>
+
+</head><body><main class="wrap">
+  <header>
+    <div class="eyebrow">Legion onboarding rebuild · PRD v3 · prototype v2</div>
+    <h1>The patient-first flow, and how much of it is built</h1>
+    <p class="dek">The new funnel from the hypotheses and PRD v3: ten stages from "In your own words, what can we help with?" to a completed first visit. The prototype builds one path all the way through and stops every other path at its handoff. The reasons come after the flow.</p>
+    <div class="legend" aria-label="Legend">
+      <span class="key"><span class="sw" aria-hidden="true"></span>Built in the prototype</span>
+      <span class="key"><span class="sw stop" aria-hidden="true"></span>Built up to a handoff, then stops</span>
+      <span class="key"><span class="sw not" aria-hidden="true"></span>Not built</span>
+      <span class="key"><span class="sim">Simulated</span>Works on screen; the system behind it is faked</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="flow-h" style="display:grid;gap:16px">
+    <h2 id="flow-h">The flow</h2>
+    <p class="note">The main path runs down the left; branches sit beside the stage they leave from. T-numbers are the A/B tests each stage carries.</p>
+    <ol class="flow">
+      <li class="stage"><div class="num" aria-hidden="true">1</div>
+        <div class="box"><h3>Landing, then "In your own words, what can we help with?"</h3><p>Every button on Legion's homepage opens the own-words screen, with the answer box on it. No account first.</p><div class="meta"><span class="t">T-01</span><span class="t">T-06</span></div></div>
+        <div class="branches"><div class="br not"><b>Free-text understanding by a live model</b><span class="why">Scripted in the prototype, behind the same seam a model would use.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">2</div>
+        <div class="box"><h3>Safety questions, then state and age</h3><p>Asked right after the first answer. Every typed line from here on is screened by rules, not the model.</p></div>
+        <div class="branches"><div class="br stop"><b>Crisis route</b><span class="why">988 call and text links are real. Same-day clinician contact is shown but not sent. The patient can keep going.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">3</div>
+        <div class="box"><h3>Fit, decided by published rules</h3><p>Texas, 18 or older, a concern Legion treats. The rule that decided is shown.</p><div class="meta"><span class="t">T-16</span></div></div>
+        <div class="branches"><div class="br stop"><b>Not a fit: another state, or under 18</b><span class="why">Says why, lists where to get help now, and offers keep-in-touch with consent (a parent's email for minors). No message is ever sent.</span></div><div class="br not"><b>Utah</b><span class="why">Shown, switched off. The brief's patient is in Texas.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">4</div>
+        <div class="box"><h3>Sign up or sign in <span class="sim">Simulated</span></h3><p>Email, then a 6-digit code. No password. Returning patients resume. The code is always 123456; no email goes out.</p><div class="meta"><span class="t">T-17</span></div></div>
+        <div class="branches"><div class="br built"><b>Wrong code</b><span class="why">"That code doesn't match," then try again.</span></div><div class="br built"><b>Returning patient</b><span class="why">Saved payment and coverage come back. Nothing asked twice.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">5</div>
+        <div class="box"><h3>How would you like to pay?</h3><p>Insurance and self-pay side by side with their prices. Self-pay is $250 a visit, marked to be verified, and skips stage 6.</p></div>
+        <div class="branches"><div class="br built"><b>Not sure yet</b><span class="why">Goes to the insurance screen with self-pay offered on it.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">6</div>
+        <div class="box"><h3>One insurance screen, checked on one tap <span class="sim">Simulated</span></h3><p>Insurer, legal name, birth date, member ID, or scan the card. The consent line sits above "Check coverage and see matches". Any details pass.</p><div class="meta"><span class="t">T-18</span></div></div>
+        <div class="branches"><div class="br built"><b>Member not found, insurer not responding, inactive, mental health handled by another company, out of network</b><span class="why">Each one is built with a way forward. They run from reviewer scenarios, so a patient trying it never gets blocked.</span></div><div class="br built"><b>Skip for now</b><span class="why">Nothing sent; coverage shows Unknown until booking.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">7</div>
+        <div class="box"><h3>See 3 matches now, or a closer match first</h3><p>One recommendation with its reasons and two alternatives. A closer match asks about times and who they'd like to see.</p><div class="meta"><span class="t">T-09</span><span class="t">T-14</span><span class="t">T-10</span></div></div>
+        <div class="branches"><div class="br built"><b>No openings, or the time gets taken</b><span class="why">Look further out, the next time with the same clinician, or self-pay.</span></div><div class="br stop"><b>Waitlist</b><span class="why">Joins the list on screen. No text goes out when a time opens.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">8</div>
+        <div class="box"><h3>Hold, confirm the cost, book <span class="sim">Simulated</span></h3><p>The hold needs a yes. The cost comes from the stage 6 check. Self-pay saves a way to pay; $0 charged today.</p><div class="meta"><span class="t">T-12</span><span class="t">T-15</span></div></div>
+        <div class="branches"><div class="br not"><b>Real scheduling and payments</b><span class="why">Openings and wallets are synthetic.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">9</div>
+        <div class="box"><h3>Get ready for the visit</h3><p>Review and share the AI-drafted summary (not a diagnosis), consent, insurance card photo, camera check. Records request is optional.</p><div class="meta"><span class="t">T-13</span></div></div>
+        <div class="branches"><div class="br stop"><b>Reminders and records request</b><span class="why">Set on screen; nothing is sent to the patient or a past clinician.</span></div></div></li>
+
+      <li class="stage"><div class="num" aria-hidden="true">10</div>
+        <div class="box"><h3>First visit completed <span class="sim">Simulated</span></h3><p>Join, the clinician confirms the visit happened, and the north-star event fires with days since the first message. Onboarding ends here.</p></div>
+        <div class="branches"><div class="br not"><b>After the first visit</b><span class="why">Follow-ups, prescriptions, rescheduling, no-shows and billing are outside the brief.</span></div></div></li>
+    </ol>
+
+    <h3 style="font:600 17px/1.2 var(--display);margin:6px 0 0">On every screen</h3>
+    <div class="always">
+      <div class="br built"><b>988 and a safety line for that step</b><span class="why">Real links.</span></div>
+      <div class="br stop"><b>Talk to a person</b><span class="why">Sends a ticket on screen. The care team's side isn't built, so no one replies.</span></div>
+      <div class="br built"><b>Plan, what I remember, activity timeline</b><span class="why">Every agent action is listed with its label.</span></div>
+      <div class="br built"><b>Rules for safety, fit, permission and clinical questions</b><span class="why">The model can't skip them. No diagnosis or medication advice.</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="scope-h" style="display:grid;gap:16px">
+    <h2 id="scope-h">What's prototyped, and what isn't</h2>
+    <div class="cols">
+      <div class="col"><h3>Built end to end</h3><ul>
+        <li>An insured Texas adult, first question to completed first visit</li>
+        <li>A self-pay Texas adult, the same distance</li>
+        <li>Every coverage failure, with its way forward</li>
+        <li>No openings and a taken slot</li>
+        <li>Closing the tab and coming back</li>
+        <li>Clinical questions refused and added to the summary</li>
+        <li>One clinician profile changing a match <span>(the clinician side is that one screen)</span></li>
+      </ul></div>
+      <div class="col stop"><h3>Built to the handoff</h3><ul>
+        <li>Crisis route <span>(clinician contact not sent)</span></li>
+        <li>Not a fit: other state, under 18 <span>(no follow-up sent)</span></li>
+        <li>Talk to a person <span>(no reply)</span></li>
+        <li>Waitlist, reminders, records request <span>(nothing sent)</span></li>
+        <li>A/B control arms <span>(each shows today's screen and stops)</span></li>
+      </ul></div>
+      <div class="col not"><h3>Not built</h3><ul>
+        <li>Real insurer, scheduling, payment, email, text and health-record connections</li>
+        <li>A live model behind the navigator</li>
+        <li>Utah, booking for another adult, minors with a guardian</li>
+        <li>Rescheduling, cancelling, no-shows, follow-up visits, prescriptions</li>
+        <li>The care team's and clinicians' tools beyond the profile screen</li>
+        <li>Identity checks, prior authorization, coverage lookup without a member ID</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="why-h" style="display:grid;gap:14px">
+    <h2 id="why-h">Why it stops where it does</h2>
+    <ol class="why-list">
+      <li><strong>The brief sets the finish line.</strong> Onboarding for a Texas patient ends at the first completed visit, so one path goes all the way there, for insurance and for self-pay.</li>
+      <li><strong>Depth goes where the thesis gets tested.</strong> The claim is that asking about the patient first, and making sign-up, coverage and matching work for them, lifts completed first visits. Those screens carry the A/B tests, so they're built in full, failures included.</li>
+      <li><strong>Handoffs stop at a person or a system Legion owns.</strong> The care team, clinicians, insurers and the crisis line sit behind these handoffs. Faking their side would hide open questions that need Legion's answers: who owns the safety rules, which eligibility vendor, the real self-pay price.</li>
+      <li><strong>Some paths are out of scope on purpose.</strong> Minors and booking for someone else are parked (D-02). Everything after the first visit is outside onboarding.</li>
+    </ol>
+  </section>
+
+  <footer>Synthetic patients and simulated systems only; no real patient information. Sources: PRD v3, Prototype Spec v3, hypotheses v2, decision log D-10 to D-24, and the prototype's 19 evaluation scenarios.</footer>
+</main>
+</body></html>

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Start Here: Legion Take-Home</title>
+<meta name="description" content="Jay Madduru's Legion Health Founding Product take-home: current-state analysis, hypotheses and A/B tests, the prototype, and the full AI interaction history.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; a numbered path down the left rail, because the reviewer reads the work in order. */
+:root{
+  --bg:#f5f9fa; --surface:#ffffff; --ink:#0f2a33; --muted:#4b6470; --rule:#d5e3e7;
+  --accent:#0e7490; --accent-soft:#e0f2f6; --ok:#166534; --ok-soft:#e3f4e8;
+  --wait:#854d0e; --wait-soft:#fbf1dc; --risk:#b91c1c; --risk-soft:#fbe9e9;
+  --display:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b1a1f; --surface:#112a31; --ink:#e4f1f4; --muted:#9db6be; --rule:#24434c;
+  --accent:#5cc3db; --accent-soft:#143c47; --ok:#6fcf8f; --ok-soft:#173a25;
+  --wait:#e7b65a; --wait-soft:#3a2f14; --risk:#f08a8a; --risk-soft:#3d1c1c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1a1f; --surface:#112a31; --ink:#e4f1f4; --muted:#9db6be; --rule:#24434c;
+  --accent:#5cc3db; --accent-soft:#143c47; --ok:#6fcf8f; --ok-soft:#173a25;
+  --wait:#e7b65a; --wait-soft:#3a2f14; --risk:#f08a8a; --risk-soft:#3d1c1c; color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto;padding-block:48px 64px;display:grid;gap:40px}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+header{display:grid;gap:14px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(30px,5vw,44px)/1.1 var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.dek{font-size:19px;color:var(--muted);margin:0;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;font:400 13px/1.4 var(--mono);color:var(--muted)}
+.short{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:22px 24px;display:grid;gap:14px}
+.short h2{font:600 15px/1.2 var(--display);margin:0;letter-spacing:.02em}
+.short p{margin:0;max-width:68ch}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.fig{border-top:2px solid var(--rule);padding-top:10px}
+.fig b{display:block;font:600 26px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.fig span{font-size:14px;color:var(--muted)}
+.fig.risk{border-top-color:var(--risk)} .fig.risk b{color:var(--risk)}
+.path{list-style:none;margin:0;padding:0;display:grid;gap:0;position:relative}
+.step{display:grid;grid-template-columns:44px 1fr;gap:18px;position:relative;padding-bottom:30px}
+.step::before{content:"";position:absolute;left:21px;top:44px;bottom:0;width:2px;background:var(--rule)}
+.step:last-child::before{display:none}
+.num{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:600 16px/1 var(--mono);
+  background:var(--surface);border:2px solid var(--rule);color:var(--muted);position:relative;z-index:1}
+.step.ready .num{border-color:var(--accent);color:var(--accent)}
+.body{min-width:0;display:grid;gap:8px;padding-top:6px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.body h3{font:600 20px/1.25 var(--display);margin:0;text-wrap:balance}
+.pill{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:999px}
+.pill.ready{background:var(--ok-soft);color:var(--ok)}
+.pill.pending{background:var(--wait-soft);color:var(--wait)}
+.pill.living{background:var(--accent-soft);color:var(--accent)}
+.body p{margin:0;max-width:66ch;color:var(--ink)}
+.body p.note{color:var(--muted);font-size:15px}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 14px;border-radius:8px;border:1px solid var(--rule);
+  background:var(--surface);color:var(--ink);text-decoration:none;font:600 15px/1.2 var(--body);transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--accent);background:var(--accent-soft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
+.btn .k{font:500 11px/1 var(--mono);color:var(--muted);letter-spacing:.06em}
+.btn.primary .k{color:inherit;opacity:1}
+footer{border-top:1px solid var(--rule);padding-top:20px;font-size:14px;color:var(--muted);display:grid;gap:6px}
+@media (max-width:520px){.step{grid-template-columns:34px 1fr;gap:12px}.num{width:34px;height:34px;font-size:14px}.step::before{left:16px;top:34px}}
+.quick{display:flex;flex-wrap:wrap;gap:8px}
+.vids{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:8px;max-width:66ch}
+.vids li{display:grid;gap:2px;padding:10px 14px;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
+.vids a{font-weight:600}
+.vids span{font-size:14px;color:var(--muted)}
+.vids .pending-v{font-weight:600;color:var(--ink);font-size:16px}
+.docs{display:grid;gap:12px}
+.docs h2{font:600 22px/1.2 var(--display);margin:0}
+.docs .note{margin:0;color:var(--muted);font-size:15px}
+.docs table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--rule);border-radius:12px;overflow:hidden;font-size:15px}
+.docs th,.docs td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+.docs th{font:500 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.docs tr:last-child td{border-bottom:none}
+.docs td:first-child a{font-weight:600}
+@media (max-width:520px){.docs td:nth-child(2),.docs th:nth-child(2){display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<header>
+  <div class="eyebrow">Start here · Legion Health Founding Product take-home</div>
+  <h1>Rebuilding Legion's patient onboarding</h1>
+  <p class="dek">From first click to a completed first visit. The work is laid out in the order it was done: what happens today, what we think is wrong, how we'd test it, and the prototype.</p>
+  <div class="meta"><span>Jay Madduru</span><span>Texas patient persona</span><span>Nov 2026</span><span><a href="https://github.com/mjayanth/legion-takehome">Repository</a></span></div>
+</header>
+
+<nav class="quick" aria-label="Main links">
+  <a class="btn primary" href="prototype/index.html">Open the prototype <span class="k">HTML</span></a>
+  <a class="btn" href="https://github.com/mjayanth/legion-takehome/pull/1">Pull request <span class="k">GitHub</span></a>
+  <a class="btn" href="#docs">All documents</a>
+  <a class="btn" href="docs/roadmap.html">Roadmap</a>
+  <a class="btn" href="https://youtu.be/Xg0KE33J9Ug">Walkthrough video <span class="k">YouTube</span></a>
+</nav>
+
+<section class="short" aria-labelledby="short-h">
+  <h2 id="short-h">The short version</h2>
+  <p>Today's onboarding puts insurance, payment and scheduling ahead of the patient's need. The drop-off numbers are a symptom of that, and tweaking individual screens won't fix it. The measured flow keeps 23.8% of sessions to the payment page and loses most of the rest at two steps: describing care needs, and picking a clinician who is often fully booked.</p>
+  <div class="figs">
+    <div class="fig"><b>Screen 10 of 17</b><span>where the flow first asks why you're here</span></div>
+    <div class="fig"><b>67%</b><span>of losses happen at 2 of 10 steps</span></div>
+    <div class="fig risk"><b>1 safety gap</b><span>a typed suicide disclosure drew no follow-up</span></div>
+  </div>
+</section>
+
+<ol class="path">
+
+  <li class="step ready">
+    <div class="num" aria-hidden="true">0</div>
+    <div class="body">
+      <div class="top"><h3>The brief and the data we were given</h3><span class="pill ready">Ready</span></div>
+      <p>What Legion asked for, and the PostHog funnel it shared: 5,898 sessions over 30 days, measured up to the payment page.</p>
+      <div class="links"><a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/00-brief/README.md">Brief summary</a><a class="btn" href="https://legionhealth.notion.site/Founding-Product-Take-Home-3cb55acd66fd81a691d7fb936f921b7b">Original brief <span class="k">Notion</span></a></div>
+    </div>
+  </li>
+
+  <li class="step ready">
+    <div class="num" aria-hidden="true">1</div>
+    <div class="body">
+      <div class="top"><h3>What onboarding does today</h3><span class="pill ready">v2</span></div>
+      <p>Two recorded walkthroughs as a Texas patient, mapped screen by screen against the telemetry. 26 observations, with every friction point marked in red. Of 17 care-flow screens, 12 serve the business and 2 serve the patient.</p>
+      <div class="links">
+        <a class="btn primary" href="docs/01-current-state/findings-v2.html">Findings page <span class="k">HTML</span></a>
+        <a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/01-current-state/funnel-map-v2.md">Funnel map</a>
+        <a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/01-current-state/observations-v2.md">Observations</a>
+        <a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/evidence/walkthroughs/README.md">Walkthrough transcripts</a>
+      </div>
+    </div>
+  </li>
+
+  <li class="step ready">
+    <div class="num" aria-hidden="true">2</div>
+    <div class="body">
+      <div class="top"><h3>Friction points, hypotheses and A/B tests</h3><span class="pill ready">v2</span></div>
+      <p>The umbrella hypothesis is that asking about the patient first lifts completion. Under it, 13 friction points become 13 hypotheses. 10 get an A/B test and 3 ship to everyone. At about 197 sessions a day, a 4-week test detects 3–14% relative lifts, so we test whole funnels first.</p>
+      <div class="links">
+        <a class="btn primary" href="docs/02-hypotheses/hypotheses-v2.html">Hypotheses page <span class="k">HTML</span></a>
+        <a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/02-hypotheses/hypotheses-experiments-v2.md">Full hypotheses and tests</a>
+      </div>
+    </div>
+  </li>
+
+  <li class="step ready">
+    <div class="num" aria-hidden="true">3</div>
+    <div class="body">
+      <div class="top"><h3>The new funnel: PRD and prototype spec</h3><span class="pill ready">v3</span></div>
+      <p>The talk-first funnel, written up. The PRD sets the goals, the patient-first order and the tests built into each step. v3 adds sign-up right after the fit checks and a consented insurance check before matching. The spec defines the agent loop, the 15 tools, the rules the model can't override, and the 19 scenarios the prototype is checked against.</p>
+      <div class="links">
+        <a class="btn primary" href="docs/03-funnels/new-flow.html">The new flow <span class="k">HTML</span></a>
+        <a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/03-funnels/prd-v3.md">PRD</a>
+        <a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/03-funnels/prototype-spec-v3.md">Prototype spec</a>
+        <a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/03-funnels/README.md">Funnel candidates</a>
+      </div>
+    </div>
+  </li>
+
+  <li class="step ready">
+    <div class="num" aria-hidden="true">4</div>
+    <div class="body">
+      <div class="top"><h3>The prototype</h3><span class="pill ready">v2</span></div>
+      <p>One path is built end to end: a Texas adult paying with insurance or self-pay, through the first completed visit. Other paths go as far as the handoff and say where the prototype stops. A care navigator that asks what's going on before anything else, then does the work with your OK: checks fit, signs you up with an email code, checks your coverage on one screen, recommends a clinician with reasons, holds a time, and stays with you through the first visit. Press R, or "How this works", to see the friction each screen fixes and the A/B test behind it. Synthetic data only.</p>
+      <div class="links"><a class="btn primary" href="prototype/index.html">Open prototype <span class="k">HTML</span></a><a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/prototype/prototype/README.md">How it's built</a><a class="btn" href="https://github.com/mjayanth/legion-takehome/pull/1">Pull request</a></div>
+    </div>
+  </li>
+
+  <li class="step ready">
+    <div class="num" aria-hidden="true">5</div>
+    <div class="body">
+      <div class="top"><h3>Decisions and backlog</h3><span class="pill living">Kept current</span></div>
+      <p>Every decision with its options and reasons, and 44 features, each linked to the observation and hypothesis behind it.</p>
+      <div class="links"><a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/decision-log.md">Decision log</a><a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/docs/feature-backlog.md">Feature backlog</a></div>
+    </div>
+  </li>
+
+  <li class="step" id="videos">
+    <div class="num" aria-hidden="true">6</div>
+    <div class="body">
+      <div class="top"><h3>Five-minute walkthrough</h3><span class="pill ready">Ready</span></div>
+      <p>The most important decisions and tradeoffs, recorded.</p>
+      <div class="links"><a class="btn primary" href="https://youtu.be/Xg0KE33J9Ug">Watch on YouTube</a><a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/video/README.md">What it covers</a></div>
+    </div>
+  </li>
+
+  <li class="step">
+    <div class="num" aria-hidden="true">7</div>
+    <div class="body">
+      <div class="top"><h3>Complete AI interaction history</h3><span class="pill ready">Ready</span></div>
+      <p>Every prompt, response, retry and correction, unedited. Only credentials and unrelated personal details are redacted, and each redaction is labelled.</p>
+      <div class="links"><a class="btn primary" href="https://github.com/mjayanth/legion-takehome/blob/main/ai-history/claude-conversation.md">Read the conversation</a><a class="btn" href="https://github.com/mjayanth/legion-takehome/tree/main/ai-history/raw">Raw session logs</a><a class="btn" href="https://github.com/mjayanth/legion-takehome/blob/main/ai-history/README.md">What's included</a></div>
+    </div>
+  </li>
+
+</ol>
+
+<section id="docs" class="docs" aria-labelledby="docs-h">
+  <h2 id="docs-h">All documents</h2>
+  <p class="note">The current version comes first. Earlier versions are kept to show how the thinking changed.</p>
+  <table>
+    <thead><tr><th scope="col">Document</th><th scope="col">What it is</th><th scope="col">Earlier</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/00-brief/README.md">Brief summary</a></td><td>The ask and the PostHog funnel Legion shared</td><td>—</td></tr>
+      <tr><td><a href="docs/01-current-state/findings-v2.html">Findings page</a></td><td>Today's onboarding on one page</td><td><a href="docs/01-current-state/findings-v1.html">v1</a></td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/01-current-state/funnel-map-v2.md">Funnel map</a></td><td>Every screen matched against the telemetry</td><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/01-current-state/funnel-map-v1.md">v1</a></td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/01-current-state/observations-v2.md">Observations</a></td><td>26 observations from two walkthroughs</td><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/01-current-state/observations-v1.md">v1</a></td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/evidence/walkthroughs/README.md">Walkthrough transcripts</a></td><td>Both recorded sessions, word for word</td><td>—</td></tr>
+      <tr><td><a href="docs/02-hypotheses/hypotheses-v2.html">Hypotheses page</a></td><td>Friction points, hypotheses and tests on one page</td><td><a href="docs/02-hypotheses/hypotheses-v1.html">v1</a></td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/02-hypotheses/hypotheses-experiments-v2.md">Hypotheses and tests</a></td><td>Each hypothesis with its test design and sample size</td><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/02-hypotheses/hypotheses-experiments-v1.md">v1</a></td></tr>
+      <tr><td><a href="docs/03-funnels/new-flow.html">The new flow</a></td><td>All ten stages, what the prototype builds and what it doesn't, and why</td><td>—</td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/03-funnels/prd-v3.md">PRD</a></td><td>The new funnel: goals, order, tests</td><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/03-funnels/prd-v1.md">v1</a></td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/03-funnels/prototype-spec-v3.md">Prototype spec</a></td><td>Agent loop, tools, policies, scenarios</td><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/03-funnels/prototype-spec-v1.md">v1</a></td></tr>
+      <tr><td><a href="prototype/index.html">Prototype</a></td><td>The working flow, in patient or reviewer view</td><td>—</td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/prototype/prototype/README.md">How the prototype is built</a></td><td>Architecture, tests and last results</td><td>—</td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/superpowers/plans/2026-11-05-onboarding-prototype.md">Build plan</a></td><td>The task-by-task plan the prototype was built from</td><td>—</td></tr>
+      <tr><td><a href="docs/roadmap.html">Roadmap</a></td><td>Where things stand and a tentative 90-day plan</td><td>—</td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/decision-log.md">Decision log</a></td><td>Every decision, its options and the reason</td><td>—</td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/docs/feature-backlog.md">Feature backlog</a></td><td>44 features, each traced to its evidence</td><td>—</td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/pull/1">Pull request</a></td><td>The prototype, opened against main</td><td>—</td></tr>
+      <tr><td><a href="https://youtu.be/Xg0KE33J9Ug">Five-minute walkthrough</a></td><td>The decisions and tradeoffs, recorded (YouTube)</td><td>—</td></tr>
+      <tr><td><a href="https://github.com/mjayanth/legion-takehome/blob/main/ai-history/README.md">AI interaction history</a></td><td>The whole conversation, unedited, with labelled redactions</td><td>—</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <span>Built with Claude, directed by Jay. Walkthroughs recorded in OpenScreen; one-page visuals made with Archify.</span>
+  <span>No real patient information is used anywhere in this repository.</span>
+</footer>
+
+</main>
+</body>
+</html>

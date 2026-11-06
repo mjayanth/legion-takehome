@@ -1,0 +1,140 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Onboarding Rebuild Roadmap</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a header with where we stand, then four time lanes left to right (stacked on phones), then the questions that gate the plan. */
+:root{
+  --bg:#f5f9fa; --surface:#ffffff; --ink:#0f2a33; --muted:#4b6470; --rule:#d5e3e7;
+  --accent:#0e7490; --accent-soft:#e0f2f6; --ok:#166534; --ok-soft:#e3f4e8;
+  --wait:#854d0e; --wait-soft:#fbf1dc; --idle:#475569; --idle-soft:#eef2f5;
+  --display:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1a1f; --surface:#112a31; --ink:#e4f1f4; --muted:#9db6be; --rule:#24434c;
+  --accent:#5cc3db; --accent-soft:#143c47; --ok:#6fcf8f; --ok-soft:#173a25;
+  --wait:#e7b65a; --wait-soft:#3a2f14; --idle:#b6c4cc; --idle-soft:#1b343c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1a1f; --surface:#112a31; --ink:#e4f1f4; --muted:#9db6be; --rule:#24434c;
+  --accent:#5cc3db; --accent-soft:#143c47; --ok:#6fcf8f; --ok-soft:#173a25;
+  --wait:#e7b65a; --wait-soft:#3a2f14; --idle:#b6c4cc; --idle-soft:#1b343c; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+.wrap{max-width:1240px;margin:0 auto;padding-block:40px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:32px}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+header{display:grid;gap:12px;max-width:72ch}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(28px,4.4vw,40px)/1.1 var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.dek{margin:0;font-size:18px;color:var(--muted)}
+.counts{display:flex;flex-wrap:wrap;gap:8px 22px;font:500 13px/1.4 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.counts b{color:var(--ink);font-weight:500}
+.lanes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}
+@media (max-width:1000px){.lanes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.lanes{grid-template-columns:minmax(0,1fr)}}
+.lane{display:grid;gap:10px;min-width:0}
+.lane-head{display:grid;gap:2px;padding-bottom:10px;border-bottom:2px solid var(--rule)}
+.lane.now .lane-head{border-bottom-color:var(--accent)}
+.lane h2{font:600 18px/1.2 var(--display);margin:0}
+.lane .when{font:500 12px/1.3 var(--mono);color:var(--muted)}
+.item{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px;display:grid;gap:8px;min-width:0}
+.lane.done .item{background:transparent}
+.item h3{font:600 15px/1.3 var(--body);margin:0;text-wrap:balance}
+.item p{margin:0;font-size:14.5px;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font:500 11px/1 var(--mono);padding:4px 6px;border-radius:5px;background:var(--idle-soft);color:var(--idle);font-variant-numeric:tabular-nums}
+.tag.t{background:var(--accent-soft);color:var(--accent)}
+.st{justify-self:start;font:500 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:4px 7px;border-radius:999px}
+.st.ok{background:var(--ok-soft);color:var(--ok)}
+.st.wait{background:var(--wait-soft);color:var(--wait)}
+.st.idle{background:var(--idle-soft);color:var(--idle)}
+.below{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+@media (max-width:800px){.below{grid-template-columns:minmax(0,1fr)}}
+.box{display:grid;gap:10px;align-content:start}
+.box h2{font:600 18px/1.2 var(--display);margin:0}
+.box ul{margin:0;padding-left:20px;display:grid;gap:6px;font-size:15px}
+.box li::marker{color:var(--muted)}
+.note{font-size:14px;color:var(--muted);margin:0}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--rule);padding-top:14px}
+</style>
+
+</head><body><main class="wrap">
+  <header>
+    <div class="eyebrow">Legion onboarding rebuild · sample roadmap · Nov 5, 2026</div>
+    <h1>Where the onboarding rebuild stands, and what comes next</h1>
+    <p class="dek">Done and Now are real. Next and Later are a tentative plan for the first 90 days. They depend on the open questions at the bottom and on what the funnel test shows.</p>
+    <div class="counts" aria-label="Status counts">
+      <span><b>25</b> decisions made</span>
+      <span><b>44</b> features: 29 in the prototype, 1 as a test, 12 ideas, 2 replaced</span>
+      <span><b>19</b> evaluation scenarios, all passing</span>
+    </div>
+  </header>
+
+  <section class="lanes" aria-label="Roadmap lanes">
+    <div class="lane done">
+      <div class="lane-head"><h2>Done</h2><span class="when">The take-home so far</span></div>
+      <article class="item"><span class="st ok">Done</span><h3>Today's onboarding, mapped</h3><p>Two recorded walkthroughs as a Texas patient against the PostHog funnel. 26 observations; the first "why are you here" comes on screen 10 of 17.</p><div class="tags"><span class="tag">Findings v2</span><span class="tag">D-01–D-05</span></div></article>
+      <article class="item"><span class="st ok">Done</span><h3>Hypotheses and test plan</h3><p>13 friction points became 13 hypotheses. 10 are A/B tests, and 3 ship to everyone. The whole funnel is tested first.</p><div class="tags"><span class="tag">H-00–H-13</span><span class="tag">D-06–D-10</span></div></article>
+      <article class="item"><span class="st ok">Done</span><h3>PRD and prototype spec, v1 to v3</h3><p>The patient-first, agentic funnel. v3 adds sign-up after the fit checks and an insurance check, with consent, before matching.</p><div class="tags"><span class="tag">D-11–D-24</span></div></article>
+      <article class="item"><span class="st ok">Done</span><h3>Prototype v1</h3><p>Built from PRD v2. Patient and reviewer views, 41 unit tests, 21 scenario runs, 0 serious accessibility issues, and it runs from GitHub Pages.</p><div class="tags"><span class="tag">F-01</span><span class="tag">F-14</span><span class="tag">F-27–F-32</span><span class="tag">F-39–F-44</span></div></article>
+      <article class="item"><span class="st ok">Done</span><h3>Start page and document index</h3><p>One link to submit, with every document, its versions, the prototype and the PR.</p><div class="tags"><span class="tag">D-21</span></div></article>
+    </div>
+
+    <div class="lane now">
+      <div class="lane-head"><h2>Now</h2><span class="when">Submitted Nov 5, 2026</span></div>
+      <article class="item"><span class="st ok">Built</span><h3>Prototype v2 from PRD v3</h3><p>Sign-in with an email code (123456 in the prototype). Insurance by card scan or typing, with consent, then a check before matching. The patient then picks 3 matches now or personalizes first.</p><div class="tags"><span class="tag">F-34</span><span class="tag">F-35</span><span class="tag">F-36</span><span class="tag t">E-13–E-19</span></div></article>
+      <article class="item"><span class="st ok">Done</span><h3>Run every scenario on v2</h3><p>44 unit tests and 33 scenario runs (E-1 to E-19 at phone and desktop widths, dark mode, and two runs typing as a real patient), with 0 serious accessibility issues, from the local file and a GitHub Pages-style server.</p><div class="tags"><span class="tag t">E-1–E-19</span></div></article>
+      <article class="item"><span class="st ok">Done</span><h3>Five-minute walkthrough</h3><p>The most important decisions and tradeoffs, recorded on YouTube, with on-screen notes for what the narration leaves out.</p><div class="tags"><span class="tag">D-25</span></div></article>
+      <article class="item"><span class="st ok">Done</span><h3>AI history, push and PR</h3><p>The full conversation, exported with labelled redactions. <code>main</code> and <code>prototype</code> pushed, the PR open, GitHub Pages live.</p><div class="tags"><span class="tag">Brief</span></div></article>
+    </div>
+
+    <div class="lane">
+      <div class="lane-head"><h2>Next</h2><span class="when">Days 1–30 · tentative</span></div>
+      <article class="item"><span class="st idle">Planned</span><h3>Measure through the first visit</h3><p>One identity per person, with events through a completed first visit and redaction in the pipeline. This has to come before any test can be read.</p><div class="tags"><span class="tag">F-20</span><span class="tag">F-25</span><span class="tag">F-31</span></div></article>
+      <article class="item"><span class="st idle">Planned</span><h3>Clinical sign-off on the rules</h3><p>The clinical team owns the safety phrase list, the fit rules and the safety copy. They review any wording that touches intake, safety or matching.</p><div class="tags"><span class="tag">F-14</span><span class="tag">F-26</span><span class="tag">F-39</span></div></article>
+      <article class="item"><span class="st idle">Planned</span><h3>Fixes that ship to everyone</h3><p>The progress bar reset and the plan-name mismatch. Plain pricing for the first visit, and what the first visit is.</p><div class="tags"><span class="tag">F-21</span><span class="tag">F-11</span><span class="tag">F-18</span></div></article>
+      <article class="item"><span class="st idle">Planned</span><h3>Funnel test: patient-first vs today</h3><p>50/50 per person, with first visit completed within 14 days as the deciding metric. This is the test that decides the thesis.</p><div class="tags"><span class="tag t">H-00</span><span class="tag">F-27</span><span class="tag">F-01</span></div></article>
+      <article class="item"><span class="st idle">Planned</span><h3>Pick the eligibility vendor</h3><p>Real-time checks through a clearinghouse, with network status from Legion's contracts. A second check when behavioral health is carved out.</p><div class="tags"><span class="tag">F-36</span><span class="tag">F-37</span></div></article>
+    </div>
+
+    <div class="lane">
+      <div class="lane-head"><h2>Later</h2><span class="when">Days 31–90 · tentative</span></div>
+      <article class="item"><span class="st idle">Planned</span><h3>Where sign-up and coverage go</h3><p>Sign-up after fit vs after the hold. The coverage check before matching vs after the hold.</p><div class="tags"><span class="tag t">T-17</span><span class="tag t">T-18</span><span class="tag">F-34</span></div></article>
+      <article class="item"><span class="st idle">Planned</span><h3>Better matching</h3><p>Real provider profiles feeding the match, one recommendation with its reasons, and the closer-match offer. Waitlists that book the first opening.</p><div class="tags"><span class="tag t">T-09</span><span class="tag t">T-14</span><span class="tag">F-29</span><span class="tag">F-30</span><span class="tag">F-23</span></div></article>
+      <article class="item"><span class="st idle">Planned</span><h3>Self-pay and payment</h3><p>One-tap wallets. A free first 5 minutes, only after operations and finance sign off.</p><div class="tags"><span class="tag t">T-12</span><span class="tag t">T-15</span><span class="tag">F-12</span><span class="tag">F-33</span></div></article>
+      <article class="item"><span class="st idle">Planned</span><h3>Fewer insurance questions</h3><p>A real card scan, and finding coverage from name, birth date and state alone.</p><div class="tags"><span class="tag">F-35</span><span class="tag">F-38</span></div></article>
+      <article class="item"><span class="st idle">Planned</span><h3>A live model behind the navigator</h3><p>Swap the scripted navigator for a model behind the same seam. The policies stay as rules, and de-identified conversations feed the learning loop.</p><div class="tags"><span class="tag t">T-06</span><span class="tag">F-28</span></div></article>
+    </div>
+  </section>
+
+  <section class="below">
+    <div class="box">
+      <h2>Open questions that gate the plan</h2>
+      <ul>
+        <li>Is $250 per visit right for self-pay, and when is it charged?</li>
+        <li>Which eligibility vendor and payer IDs does Legion use today, and which carve-outs need a second check?</li>
+        <li>Is an email code enough for sign-in under Legion's security policy?</li>
+        <li>Who on the clinical team owns the safety and fit rules?</li>
+        <li>Is "no availability" for insured patients a supply problem or a display problem?</li>
+        <li>Do insured patients need a card on file for copays?</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h2>Parked until there's a reason</h2>
+      <ul>
+        <li>Booking for another adult (F-15) and serving minors with a guardian (F-16, D-02)</li>
+        <li>Identity and address checks (F-17)</li>
+        <li>Asking "new or already diagnosed" (F-04) and provider filters (F-08)</li>
+        <li>Matching reviews on the site and in booking (F-09)</li>
+        <li>Self-serve insurance changes (F-13)</li>
+      </ul>
+      <p class="note">F-02 and F-10 were replaced by F-34 and F-36.</p>
+    </div>
+  </section>
+
+  <footer>IDs refer to the decision log (D), feature backlog (F), hypotheses and tests (H, T) and Spec v3 scenarios (E) in the repository. Synthetic data only; no real patient information.</footer>
+</main>
+</body></html>

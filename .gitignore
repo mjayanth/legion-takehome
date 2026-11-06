@@ -1,0 +1,9 @@
+.DS_Store
+*.mp4
+*.mov
+*.webm
+node_modules/
+.archify/
+*.finalize*.json
+*.delivery*.json
+.env
