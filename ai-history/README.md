@@ -14,7 +14,7 @@ The brief asks for the complete, unedited history of every AI interaction used f
 
 The session's working machine restarted once during the day. The log saved on it starts at 11:45 AM PT. The first 50 minutes (from the opening prompt at 10:55 AM PT) are not in that file. They are in the same conversation in the Claude app, and appear in the log in condensed form: when a long conversation runs out of room, Claude Code writes a summary of the earlier part, and that summary is in the raw log.
 
-The complete conversation, from the first prompt, is viewable here: *share link added at submission*.
+Near the end of the day the conversation was condensed a second time, and the working machine's log restarted from that point. The raw log here joins the two saved files in time order, so nothing from 11:45 AM PT to submission is missing.
 
 ## Redactions
 
