@@ -1,0 +1,36 @@
+// Synthetic patients and the evaluation scenarios that use them.
+export const PERSONAS = {
+  maya: { id: 'maya', name: 'Maya', blurb: '29, Austin. Worry and poor sleep for months, never diagnosed. Lone Star Health PPO.',
+    answers: { story: "I've been worried all the time for months and I can't sleep. I don't really know what kind of help I need.",
+      safety: 'no', state: 'TX', adult: 'yes', pay: 'insurance', plan: 'lonestar', times: ['afternoon'], signin: 'maya@example.com', code: '123456', insurance: 'lonestar', legalName: 'Maya Ortiz', dob: '1997-03-02', memberId: 'LSH 2041 0093' } },
+  daniel: { id: 'daniel', name: 'Daniel', blurb: '41, Houston. Diagnosed with depression years ago, off medication, wants to restart. Paying himself.',
+    answers: { story: 'I was diagnosed with depression years ago and stopped my meds. Lately I feel down most days and I want to restart care.',
+      safety: 'no', state: 'TX', adult: 'yes', pay: 'selfpay', times: ['morning', 'afternoon'], signin: 'daniel@example.com', code: '123456', insurance: 'bluebonnet', legalName: 'Daniel Reyes', dob: '1985-08-14', memberId: 'BCE 7710 2258' } },
+  priya: { id: 'priya', name: 'Priya', blurb: '24, Dallas. Answers No to the safety question, then types a disclosure.',
+    answers: { story: "Work has been a lot and I've felt flat and empty for months.", safety: 'no', state: 'TX', adult: 'yes', pay: 'insurance', plan: 'bluebonnet', times: ['evening'], signin: 'priya@example.com', code: '123456', insurance: 'bluebonnet', legalName: 'Priya Natarajan', dob: '2002-01-19', memberId: 'BCE 3391 0457' } },
+  sam: { id: 'sam', name: 'Sam', blurb: '34, lives in California.', answers: { story: 'I get panic attacks before work most mornings.', safety: 'no', state: 'CA', adult: 'yes' } },
+  alex: { id: 'alex', name: 'Alex', blurb: '16, Texas.', answers: { story: "I can't focus at school and I'm stressed all the time.", safety: 'no', state: 'TX', adult: 'no' } },
+};
+
+export const SCENARIOS = [
+  { id: 'E-1', persona: 'maya', title: 'Insured patient finds and prepares for care' },
+  { id: 'E-2', persona: 'daniel', title: 'Self-pay without insurance as the default' },
+  { id: 'E-3', persona: 'maya', title: 'Insurer does not respond', flags: { eligibility: 'no_response' } },
+  { id: 'E-4', persona: 'maya', title: 'The recommended time does not fit' },
+  { id: 'E-5', persona: 'daniel', title: 'Why do you need this?' },
+  { id: 'E-6', persona: 'maya', title: 'Progress kept after closing the tab' },
+  { id: 'E-7', persona: 'maya', title: 'No openings, then a time gets taken', flags: { slotTaken: true }, override: { plan: 'gulfcoast', insurance: 'gulfcoast' } },
+  { id: 'E-8', persona: 'daniel', title: 'Refuses to diagnose or advise on medication' },
+  { id: 'E-9', persona: 'priya', title: 'Safety concern routed by policy' },
+  { id: 'E-10', persona: 'maya', title: 'Supported through the first visit' },
+  { id: 'E-11', persona: 'sam', title: 'Not a fit: outside Texas' },
+  { id: 'E-11b', persona: 'alex', title: 'Not a fit: under 18' },
+  { id: 'E-12', persona: null, title: 'A provider profile changes the match', provider: true },
+  { id: 'E-13', persona: 'maya', title: 'Sign up after fit, wrong code first' },
+  { id: 'E-14', persona: 'maya', title: 'A returning patient signs back in', flags: { returning: true } },
+  { id: 'E-15', persona: 'daniel', title: 'Member not found, fixed on retry', flags: { eligibility: 'not_found_once' }, override: { pay: 'insurance' } },
+  { id: 'E-16', persona: 'priya', title: 'Coverage inactive, switch to self-pay', flags: { eligibility: 'inactive' } },
+  { id: 'E-17', persona: 'maya', title: 'Mental health benefits managed by another company', flags: { eligibility: 'carve_out' } },
+  { id: 'E-18', persona: 'maya', title: 'Plan not in network with Legion', flags: { eligibility: 'out_of_network' } },
+  { id: 'E-19', persona: 'maya', title: 'Skips the coverage check' },
+];
